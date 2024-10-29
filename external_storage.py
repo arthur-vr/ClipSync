@@ -5,8 +5,7 @@ from .constants import VERSION_STRING, CLIP_PATH, PRODUCT_NAME_UNDERSCORE, DEFAU
 
 class ExternalStorage:
     def __init__(self):
-        blender_file_name = bpy.path.basename(bpy.data.filepath)
-        self.file_path = os.path.join(bpy.utils.user_resource('SCRIPTS'), "addons", f"{PRODUCT_NAME_UNDERSCORE}_settings_{VERSION_STRING}_{blender_file_name}.json")
+        self.file_path = os.path.join(bpy.utils.user_resource('SCRIPTS'), "addons", f"{PRODUCT_NAME_UNDERSCORE}_settings_{VERSION_STRING}.json")
         self.data = self.load_data()
 
     def load_data(self):
