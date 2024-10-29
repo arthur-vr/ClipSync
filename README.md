@@ -12,7 +12,19 @@ https://x.com/arthur484_/status/1846780897724715502
 
 ## Download
 
+English:
+Please use v1.0.4 because v1.0.5 has a bug.
+v1.0.4 has no functional difference from the previous version, but it is for testing, so you need to unzip the zip file and install clipSync.py directly as an addon.
+
+日本語:
+v1.0.5最新は、バグがあるため、v1.0.4を使用してください。
+v1.0.4は以前は機能に違いはないですが、テスト用なので、zipを解凍してから、
+直接clipSync.pyをaddonとしてインストールする必要があります。
+
+↓↓
+
 [Releases](https://github.com/arthur-vr/ClipSync/releases)
+
 
 ## How to invoke
 
