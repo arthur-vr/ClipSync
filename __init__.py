@@ -8,7 +8,7 @@ bl_info = {
     "category": "Object",
     "description": "sync canvas preview image from .clip file to .png file in blender",
     "author": "Smiley Cat",
-    "version": (1, 0, 5),
+    "version": (1, 0, 6),
     "location": "View3D > Object > ClipSync",
 }
 

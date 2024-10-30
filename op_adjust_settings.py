@@ -94,6 +94,17 @@ def trimUnnecessaries(path):
 def replaceDoubleQuote(path):
     return path.replace("\"", "")
 
+def is_clip_file_updated(clip_file_path):
+    clip_file_modified_time = os.path.getmtime(clip_file_path)
+    if not hasattr(bpy.types.Scene, "clipsync_prev_clip_file_modified_time"):
+        bpy.types.Scene.clipsync_prev_clip_file_modified_time = clip_file_modified_time
+        return True
+    prev_modified_time = bpy.types.Scene.clipsync_prev_clip_file_modified_time
+    if prev_modified_time == clip_file_modified_time:
+        return False
+    bpy.types.Scene.clipsync_prev_clip_file_modified_time = clip_file_modified_time
+    return True
+
 def get_sqlite_binary_data_from_clip_file(filepath):
     chunk_data_list = []
     binary_data = None
@@ -142,12 +153,11 @@ def exec_sqlite_query(
     return query_results
 
 def extract_canvas_preview_image_binary(
-    sqlite_binary_data,
-    temp_db_path,
+    sqlite_binary_data
 ):
-    with open(temp_db_path, mode="wb") as f:
-        f.write(sqlite_binary_data)
-    connect = sqlite3.connect(temp_db_path)
+    connect = sqlite3.connect(':memory:')
+    connect.deserialize(sqlite_binary_data)
+    connect.commit()
     query_results = exec_sqlite_query(
         connect,
         "SELECT ImageData FROM CanvasPreview;",
@@ -157,17 +167,14 @@ def extract_canvas_preview_image_binary(
     else:
         image_binary = None
     connect.close()
-    os.remove(temp_db_path)
     return image_binary
 
 def get_canvas_preview(
-    clip_file_path,
-    tmp_db_path,
+    clip_file_path
 ):
     sqlite_binary_data = get_sqlite_binary_data_from_clip_file(clip_file_path)
     image_binary = extract_canvas_preview_image_binary(
-        sqlite_binary_data,
-        tmp_db_path,
+        sqlite_binary_data
     )
     return image_binary
 
@@ -198,8 +205,11 @@ def update_image(root_path, base_name, output_path, sync_interval):
                 print(f"${PRODUCT_NAME}--------------------------------------")
                 print(f"loop update clip to png... {current_time}")
             clip_file_path = os.path.join(root_path, f"{base_name}.clip")
-            tmp_db_path = os.path.join(root_path, f"{base_name}.db")
-            image_binary = get_canvas_preview(clip_file_path, tmp_db_path)
+            if not is_clip_file_updated(clip_file_path):
+                if IS_DEBUG:
+                    print(f"clip file is not updated: {clip_file_path}")
+                return sync_interval
+            image_binary = get_canvas_preview(clip_file_path)
             with open(output_path, 'wb') as f:
                 f.write(image_binary)
             if bpy.types.Scene.cs_is_loop:
@@ -228,9 +238,11 @@ def check_and_reload_textures(watched_file_path, sync_interval):
                             image.reload()
                             image["last_check_time"] = file_mtime
                         else:
-                            print(f"No need to reload texture: {image.name}")
+                            if IS_DEBUG:
+                                print(f"No need to reload texture: {image.name}")
             else:
-                print(f"File does not exist: {watched_file_path}")
+                if IS_DEBUG:
+                    print(f"File does not exist: {watched_file_path}")
             if bpy.types.Scene.cs_is_loop:
                 return sync_interval
             else:
