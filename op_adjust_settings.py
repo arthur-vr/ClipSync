@@ -94,6 +94,17 @@ def trimUnnecessaries(path):
 def replaceDoubleQuote(path):
     return path.replace("\"", "")
 
+def is_clip_file_updated(clip_file_path):
+    clip_file_modified_time = os.path.getmtime(clip_file_path)
+    if not hasattr(bpy.types.Scene, "clipsync_prev_clip_file_modified_time"):
+        bpy.types.Scene.clipsync_prev_clip_file_modified_time = clip_file_modified_time
+        return True
+    prev_modified_time = bpy.types.Scene.clipsync_prev_clip_file_modified_time
+    if prev_modified_time == clip_file_modified_time:
+        return False
+    bpy.types.Scene.clipsync_prev_clip_file_modified_time = clip_file_modified_time
+    return True
+
 def get_sqlite_binary_data_from_clip_file(filepath):
     chunk_data_list = []
     binary_data = None
@@ -194,6 +205,10 @@ def update_image(root_path, base_name, output_path, sync_interval):
                 print(f"${PRODUCT_NAME}--------------------------------------")
                 print(f"loop update clip to png... {current_time}")
             clip_file_path = os.path.join(root_path, f"{base_name}.clip")
+            if not is_clip_file_updated(clip_file_path):
+                if IS_DEBUG:
+                    print(f"clip file is not updated: {clip_file_path}")
+                return sync_interval
             image_binary = get_canvas_preview(clip_file_path)
             with open(output_path, 'wb') as f:
                 f.write(image_binary)
@@ -223,9 +238,11 @@ def check_and_reload_textures(watched_file_path, sync_interval):
                             image.reload()
                             image["last_check_time"] = file_mtime
                         else:
-                            print(f"No need to reload texture: {image.name}")
+                            if IS_DEBUG:
+                                print(f"No need to reload texture: {image.name}")
             else:
-                print(f"File does not exist: {watched_file_path}")
+                if IS_DEBUG:
+                    print(f"File does not exist: {watched_file_path}")
             if bpy.types.Scene.cs_is_loop:
                 return sync_interval
             else:
