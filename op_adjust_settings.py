@@ -142,12 +142,11 @@ def exec_sqlite_query(
     return query_results
 
 def extract_canvas_preview_image_binary(
-    sqlite_binary_data,
-    temp_db_path,
+    sqlite_binary_data
 ):
-    with open(temp_db_path, mode="wb") as f:
-        f.write(sqlite_binary_data)
-    connect = sqlite3.connect(temp_db_path)
+    connect = sqlite3.connect(':memory:')
+    connect.deserialize(sqlite_binary_data)
+    connect.commit()
     query_results = exec_sqlite_query(
         connect,
         "SELECT ImageData FROM CanvasPreview;",
@@ -157,17 +156,14 @@ def extract_canvas_preview_image_binary(
     else:
         image_binary = None
     connect.close()
-    os.remove(temp_db_path)
     return image_binary
 
 def get_canvas_preview(
-    clip_file_path,
-    tmp_db_path,
+    clip_file_path
 ):
     sqlite_binary_data = get_sqlite_binary_data_from_clip_file(clip_file_path)
     image_binary = extract_canvas_preview_image_binary(
-        sqlite_binary_data,
-        tmp_db_path,
+        sqlite_binary_data
     )
     return image_binary
 
@@ -198,8 +194,7 @@ def update_image(root_path, base_name, output_path, sync_interval):
                 print(f"${PRODUCT_NAME}--------------------------------------")
                 print(f"loop update clip to png... {current_time}")
             clip_file_path = os.path.join(root_path, f"{base_name}.clip")
-            tmp_db_path = os.path.join(root_path, f"{base_name}.db")
-            image_binary = get_canvas_preview(clip_file_path, tmp_db_path)
+            image_binary = get_canvas_preview(clip_file_path)
             with open(output_path, 'wb') as f:
                 f.write(image_binary)
             if bpy.types.Scene.cs_is_loop:
