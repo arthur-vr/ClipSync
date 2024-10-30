@@ -1,7 +1,7 @@
 import os
 
-VERSION_NAME = "mink"
-VERSION_STRING = f"1.0.6 ({VERSION_NAME})"
+VERSION_NAME = "owl"
+VERSION_STRING = f"1.0.7 ({VERSION_NAME})"
 IS_DEBUG = False
 PRODUCT_NAME = "ClipSync"
 PRODUCT_NAME_UNDERSCORE = "clipsync"
