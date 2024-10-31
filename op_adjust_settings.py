@@ -11,6 +11,9 @@ from . import op_open_document_link
 from . import op_stop_loop
 from .external_storage import ExternalStorage
 
+def SEARCH_OBJECT_OT_adjust_settings(self, context):
+    self.layout.operator(OBJECT_OT_adjust_settings.bl_idname)
+
 class OBJECT_OT_adjust_settings(bpy.types.Operator):
     bl_idname = f"object.{PRODUCT_NAME_UNDERSCORE}_adjust_settings"
     bl_label = f"{PRODUCT_NAME} v{VERSION_STRING}"
@@ -254,6 +257,8 @@ def check_and_reload_textures(watched_file_path, sync_interval):
 
 def register():
     bpy.utils.register_class(OBJECT_OT_adjust_settings)
+    bpy.types.VIEW3D_MT_object.append(SEARCH_OBJECT_OT_adjust_settings)
 
 def unregister():
     bpy.utils.unregister_class(OBJECT_OT_adjust_settings)
+    bpy.types.VIEW3D_MT_object.remove(SEARCH_OBJECT_OT_adjust_settings)
