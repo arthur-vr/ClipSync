@@ -17,14 +17,18 @@ https://x.com/arthur484_/status/1846780897724715502
 
 ## How to invoke
 
+![Developer Extras](./images/demo_developer_extras.png)
+
 ![Search](./images/demo_search.png)
 
 English:
 - Install the addon
+- Enable Developer Extras
 - press F3 and type `clipsync`
 
 日本語:
 - アドオンをインストール
+- Develoer Extrasを有効にする
 - f3を押してclipsyncと検索
 
 ## Panel Description
