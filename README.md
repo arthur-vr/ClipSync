@@ -12,7 +12,16 @@ https://x.com/arthur484_/status/1846780897724715502
 
 ## Download
 
-[Releases](https://github.com/arthur-vr/ClipSync/releases)
+English:
+This is a volunteer project.  If you find it useful, please consider supporting my work by purchasing something from my shop. I would greatly appreciate it, and it will help me continue to improve ClipSync!
+
+日本語:
+ボランティア開発のため、あ～さ～のboothでなにか買ってくれたら、
+跳ねて喜びます。今後のClipSyncのバージョンアップにつながります。
+
+[Arthur's booth shop](https://arthur484.booth.pm/)
+
+[Download](https://github.com/arthur-vr/ClipSync/releases)
 
 
 ## How to invoke
