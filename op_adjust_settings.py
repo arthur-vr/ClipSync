@@ -155,29 +155,38 @@ def exec_sqlite_query(
     cursor.close()
     return query_results
 
-def extract_canvas_preview_image_binary(
-    sqlite_binary_data
-):
-    connect = sqlite3.connect(':memory:')
-    connect.deserialize(sqlite_binary_data)
-    connect.commit()
+def get_image_binary(connect):
     query_results = exec_sqlite_query(
         connect,
         "SELECT ImageData FROM CanvasPreview;",
     )
-    if query_results:
-        image_binary = query_results[0][0]
+    return query_results[0][0] if query_results else None
+
+def extract_canvas_preview_image_binary(
+    sqlite_binary_data,
+    tmp_db_path,
+):
+    connect = sqlite3.connect(':memory:')
+    if hasattr(connect, 'deserialize'):
+        connect.deserialize(sqlite_binary_data)
+        connect.commit()
+        image_binary = get_image_binary(connect)
     else:
-        image_binary = None
+        with open(tmp_db_path, mode="wb") as f:
+            f.write(sqlite_binary_data)
+        connect = sqlite3.connect(tmp_db_path)
+        image_binary = get_image_binary(connect)
     connect.close()
     return image_binary
 
 def get_canvas_preview(
-    clip_file_path
+    clip_file_path,
+    tmp_db_path,
 ):
     sqlite_binary_data = get_sqlite_binary_data_from_clip_file(clip_file_path)
     image_binary = extract_canvas_preview_image_binary(
-        sqlite_binary_data
+        sqlite_binary_data,
+        tmp_db_path,
     )
     return image_binary
 
@@ -212,7 +221,8 @@ def update_image(root_path, base_name, output_path, sync_interval):
                 if IS_DEBUG:
                     print(f"clip file is not updated: {clip_file_path}")
                 return sync_interval
-            image_binary = get_canvas_preview(clip_file_path)
+            tmp_db_path = os.path.join(root_path, f"{base_name}.db")
+            image_binary = get_canvas_preview(clip_file_path, tmp_db_path)
             with open(output_path, 'wb') as f:
                 f.write(image_binary)
             if bpy.types.Scene.cs_is_loop:
