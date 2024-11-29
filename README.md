@@ -21,23 +21,21 @@ This is a volunteer project.  If you find it useful, please consider supporting 
 
 [Arthur's booth shop](https://arthur484.booth.pm/)
 
+[Arthur's fan box](https://arthur484.fanbox.cc/)
+
 [Download](https://github.com/arthur-vr/ClipSync/releases)
 
 
 ## How to invoke
 
-![Developer Extras](./images/demo_developer_extras.png)
-
 ![Search](./images/demo_search.png)
 
 English:
 - Install the addon
-- Enable Developer Extras
 - press F3 and type `clipsync`
 
 日本語:
 - アドオンをインストール
-- Develoer Extrasを有効にする
 - f3を押してclipsyncと検索
 
 ## Panel Description
