@@ -1,7 +1,7 @@
 import bpy
 import json
 import os
-from .constants import VERSION_STRING, CLIP_PATH, PRODUCT_NAME_UNDERSCORE, DEFAULT_CLIP_PATH, DEFAULT_SYNC_INTERVAL, PROPERTY_NAME
+from .constants import VERSION_STRING, CLIP_PATH, PRODUCT_NAME_UNDERSCORE, DEFAULT_PARENT_CLIP_PATH,DEFAULT_CLIP_PATH, DEFAULT_SYNC_INTERVAL, PROPERTY_NAME
 
 class ExternalStorage:
     def __init__(self):
@@ -18,7 +18,10 @@ class ExternalStorage:
             CLIP_PATH[3]: DEFAULT_CLIP_PATH,
             CLIP_PATH[4]: DEFAULT_CLIP_PATH,
             CLIP_PATH[5]: DEFAULT_CLIP_PATH,
-            PROPERTY_NAME["sync_interval"]: DEFAULT_SYNC_INTERVAL
+            PROPERTY_NAME["sync_interval"]: DEFAULT_SYNC_INTERVAL,
+            PROPERTY_NAME["is_use_parent_folder"]: False,
+            PROPERTY_NAME["parent_folder_path"]: DEFAULT_PARENT_CLIP_PATH,
+            PROPERTY_NAME["suffix"]: ""
         }
 
     def save_data(self):
