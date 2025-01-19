@@ -1,12 +1,12 @@
 import bpy
-from bpy.props import StringProperty, FloatProperty
+from bpy.props import StringProperty, FloatProperty, BoolProperty
 from bpy.app import timers
 import os
 import struct
 import sqlite3
 import copy
 import time
-from .constants import PROPERTY_NAME,VERSION_STRING, DEFAULT_CLIP_PATH,DEFAULT_CLIP_PATH_NAME,DEFAULT_CLIP_PATH, DEFAULT_SYNC_INTERVAL, CLIP_PATH, PRODUCT_NAME, PRODUCT_NAME_UNDERSCORE, IS_DEBUG,DEFAULT_CLIP_PATH
+from .constants import PROPERTY_NAME,VERSION_STRING,DEFAULT_PARENT_CLIP_PATH, DEFAULT_CLIP_PATH,DEFAULT_CLIP_PATH_NAME,DEFAULT_CLIP_PATH, DEFAULT_SYNC_INTERVAL, CLIP_PATH, PRODUCT_NAME, PRODUCT_NAME_UNDERSCORE, IS_DEBUG,DEFAULT_CLIP_PATH
 from . import op_open_document_link
 from . import op_stop_loop
 from .external_storage import ExternalStorage
@@ -24,8 +24,11 @@ class OBJECT_OT_adjust_settings(bpy.types.Operator):
     clip_path3 : StringProperty(name="clip slot 3", maxlen=32767, default=DEFAULT_CLIP_PATH,subtype="FILE_PATH")
     clip_path4 : StringProperty(name="clip slot 4", maxlen=32767, default=DEFAULT_CLIP_PATH,subtype="FILE_PATH")
     clip_path5 : StringProperty(name="clip slot 5", maxlen=32767, default=DEFAULT_CLIP_PATH,subtype="FILE_PATH")
+    is_use_parent_folder : BoolProperty(name="use parent folder", default=False)
+    parent_folder_path : StringProperty(name="parent folder", maxlen=32767, default=DEFAULT_PARENT_CLIP_PATH,subtype="DIR_PATH")
+    suffix : StringProperty(name="suffix", maxlen=32767, default="")
     sync_interval : FloatProperty(name="sync interval", default=DEFAULT_SYNC_INTERVAL)
-    
+
     storage = ExternalStorage()
     
     def draw(self,context):
@@ -35,6 +38,10 @@ class OBJECT_OT_adjust_settings(bpy.types.Operator):
         layout.prop(self, f"{CLIP_PATH[3]}")
         layout.prop(self, f"{CLIP_PATH[4]}")
         layout.prop(self, f"{CLIP_PATH[5]}")
+        layout.prop(self, f"{PROPERTY_NAME['is_use_parent_folder']}")
+        if self.is_use_parent_folder:
+            layout.prop(self, f"{PROPERTY_NAME['parent_folder_path']}")
+        layout.prop(self, f"{PROPERTY_NAME['suffix']}")
         layout.prop(self, f"{PROPERTY_NAME['sync_interval']}")
         layout.operator(op_open_document_link.OBJECT_OT_open_document_link.bl_idname, text="Document")
         layout.operator(op_stop_loop.OBJECT_OT_stop_loop.bl_idname, text="Stop")
@@ -59,13 +66,27 @@ class OBJECT_OT_adjust_settings(bpy.types.Operator):
         self.storage.set(CLIP_PATH[3], self.clip_path3)
         self.storage.set(CLIP_PATH[4], self.clip_path4)
         self.storage.set(CLIP_PATH[5], self.clip_path5)
+        self.storage.set(PROPERTY_NAME["is_use_parent_folder"], self.is_use_parent_folder)
+        self.storage.set(PROPERTY_NAME["parent_folder_path"], self.parent_folder_path)
+        self.storage.set(PROPERTY_NAME["suffix"], self.suffix)
         self.storage.set(PROPERTY_NAME["sync_interval"], self.sync_interval)
 
     def execute(self, context):
         self.save_properties()
-        clip_path_list = get_clip_path_list(self.clip_path1, self.clip_path2, self.clip_path3, self.clip_path4, self.clip_path5)
+        clip_path_list = get_clip_path_list(
+            self.clip_path1,
+            self.clip_path2,
+            self.clip_path3,
+            self.clip_path4,
+            self.clip_path5,
+            self.is_use_parent_folder,
+            self.parent_folder_path,
+            self.suffix,
+        )
         self.report({'INFO'}, f"{PRODUCT_NAME} started!: {clip_path_list}")
         sync_interval = self.sync_interval
+        bpy.types.Scene.cs_is_loop = False
+        time.sleep(0.5)
         bpy.types.Scene.cs_is_loop = True
         start_loop(sync_interval, clip_path_list)
         return {'FINISHED'}
@@ -75,19 +96,39 @@ def check_clip_file_path(clip_path):
         return False
     return True
 
-def get_clip_path_list(clip_path_1, clip_path_2, clip_path_3, clip_path_4, clip_path_5):
-    path1 = get_clip_path(clip_path_1)
-    path2 = get_clip_path(clip_path_2)
-    path3 = get_clip_path(clip_path_3)
-    path4 = get_clip_path(clip_path_4)
-    path5 = get_clip_path(clip_path_5)
+def get_clip_path_list(
+    clip_path_1,
+    clip_path_2,
+    clip_path_3,
+    clip_path_4,
+    clip_path_5,
+    is_use_parent_folder,
+    parent_folder_path,
+    suffix,
+):
+    path1 = get_clip_path(clip_path_1, is_use_parent_folder, parent_folder_path, suffix)
+    path2 = get_clip_path(clip_path_2, is_use_parent_folder, parent_folder_path, suffix)
+    path3 = get_clip_path(clip_path_3, is_use_parent_folder, parent_folder_path, suffix)
+    path4 = get_clip_path(clip_path_4, is_use_parent_folder, parent_folder_path, suffix)
+    path5 = get_clip_path(clip_path_5, is_use_parent_folder, parent_folder_path, suffix)
     return path1, path2, path3, path4, path5
 
+def tail_suffix(base_name, suffix):
+    if suffix != "":
+        return f"{base_name}_{suffix}"
+    return base_name
 
-def get_clip_path(clip_path):
+def get_clip_path(
+    clip_path,
+    is_use_parent_folder,
+    parent_folder_path,
+    suffix,
+):
     root_path = trimUnnecessaries(os.path.dirname(clip_path))
     base_name = trimUnnecessaries(os.path.splitext(os.path.basename(clip_path))[0])
-    output_path = trimUnnecessaries(os.path.join(root_path, f"{base_name}.png"))
+    output_path = trimUnnecessaries(os.path.join(root_path, f"{tail_suffix(base_name, suffix)}.png"))
+    if is_use_parent_folder:
+        output_path = trimUnnecessaries(os.path.join(parent_folder_path, f"{tail_suffix(base_name, suffix)}.png"))
     return root_path, base_name, output_path
 
 def trimUnnecessaries(path):
@@ -192,19 +233,19 @@ def get_canvas_preview(
 
 def start_loop(sync_interval, clip_path_list):
     for root_path, base_name, output_path in clip_path_list:
-        if(base_name == DEFAULT_CLIP_PATH_NAME):
+        if DEFAULT_CLIP_PATH_NAME in base_name:
             continue
         if not check_clip_file_path(root_path):
             continue
         update_image_on_timer(root_path, base_name, output_path, sync_interval)
-        start_image_on_timer(output_path, sync_interval)
+        check_image_on_timer(output_path, sync_interval)
 
 def update_image_on_timer(root_path, base_name, output_path, sync_interval):
     clip_timer_func = update_image(root_path, base_name, output_path, sync_interval)
     if not timers.is_registered(clip_timer_func):
         timers.register(clip_timer_func, first_interval=sync_interval, persistent=True)
 
-def start_image_on_timer(output_path, sync_interval):
+def check_image_on_timer(output_path, sync_interval):
     image_timer_func = check_and_reload_textures(output_path, sync_interval)
     if not timers.is_registered(image_timer_func):
         timers.register(image_timer_func, first_interval=sync_interval, persistent=True)
@@ -234,17 +275,17 @@ def update_image(root_path, base_name, output_path, sync_interval):
             return None
     return timer_func
 
-def check_and_reload_textures(watched_file_path, sync_interval):
+def check_and_reload_textures(output_path, sync_interval):
     def timer_func():
         try:
             if IS_DEBUG:
                 current_time = time.strftime("%M:%S", time.localtime())
                 print(f"loop update texture... {current_time}")
-            if os.path.exists(watched_file_path):
-                file_mtime = os.path.getmtime(watched_file_path)
+            if os.path.exists(output_path):
+                file_mtime = os.path.getmtime(output_path)
                 for image in bpy.data.images:
                     image_path = bpy.path.abspath(image.filepath)
-                    if os.path.abspath(image_path) == os.path.abspath(watched_file_path):
+                    if os.path.abspath(image_path) == os.path.abspath(output_path):
                         if "last_check_time" not in image:
                             image["last_check_time"] = 0
                         if file_mtime > image["last_check_time"]:
@@ -255,7 +296,7 @@ def check_and_reload_textures(watched_file_path, sync_interval):
                                 print(f"No need to reload texture: {image.name}")
             else:
                 if IS_DEBUG:
-                    print(f"File does not exist: {watched_file_path}")
+                    print(f"File does not exist: {output_path}")
             if bpy.types.Scene.cs_is_loop:
                 return sync_interval
             else:
