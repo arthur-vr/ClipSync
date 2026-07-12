@@ -1,0 +1,4 @@
+interface:
+  display_name: "Commit with Emoji"
+  short_description: "Create focused Git commits with emoji prefixes"
+  default_prompt: "Use $commit-with-emoji to review my changes and create a focused commit with the appropriate emoji prefix."
