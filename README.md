@@ -1,5 +1,7 @@
 # ClipSync
 
+Version: **1.1.0-sun**
+
 English:
 Synchronize canvas preview image from .clip file to .png file in blender
 
@@ -16,13 +18,12 @@ English:
 This is a volunteer project.  If you find it useful, please consider supporting my work by purchasing something from my shop. I would greatly appreciate it, and it will help me continue to improve ClipSync!
 
 日本語:
-ボランティア開発のため、あ～さ～のbooth,fanbox見てくれたら、
+ボランティア開発のため、あ～さ～のboothを見てくれたら、
 跳ねて喜びぶよ～! 今後のClipSyncのバージョンアップのモチベーションにするよ!
 
-[Arthur's fan box](https://arthur484.fanbox.cc/)
+[Blender addon](https://github.com/arthur-vr/ClipSync/releases)
 
-[Download](https://github.com/arthur-vr/ClipSync/releases)
-
+[Desktop App](https://arthur484.booth.pm/items/8609124)
 
 ## How to invoke
 
@@ -38,7 +39,10 @@ English:
 
 ## Panel Description
 
+
+### .clip mode
 ![Panel](./images/demo_panel.png)
+
 
 English:
 - clip slot 1-5: set the path of the clip under Users/*, only the clip file that exists will be synchronized
@@ -61,6 +65,22 @@ English:
 - Stop: 同期を停止
 - OK: 同期が開始され、.clipファイルと同じディレクトリに.pngファイルが生成されるので、それをテクスチャとして設定してください
 
+
+### window capture mode
+
+![Panel](./images/demo_window_capture.png)
+
+English:
+- Get the capture software on Booth: https://arthur484.booth.pm/items/8609124
+- Press "Get Sync ON Projects" to sync the projects whose sync is turned ON in the desktop app.
+- Turn on the checkbox and press OK, then a texture with that name will be synchronized. Use that image in your material.
+
+日本語:
+- https://arthur484.booth.pm/items/8609124 Boothでキャプチャ用ソフトを取得します
+- 同期ONプロジェクトを取得(Get Sync ON Projects)を押すと、デスクトップアプリで同期がONになっているプロジェクト同期します。
+- チェックボックスをOnにしてOKをおすとその名前でtextureが同期されるようになるので、その画像をマテリアルで使用します。
+
+
 ## Differences from AutoSync (frequently asked questions)
 
 English:
@@ -80,14 +100,16 @@ English:
 
 ### English:
 #### Image quality is poor when using 4k images
-##### This addon is intended to improve the efficiency of texture creation, and the exported texture should be used instead of the preview image.
+##### Window Capture mode has no such limitation, so even 4k images can be updated in real time.
 
-#### Real-time update is not performed
-##### This addon monitors the modification time of the .clip file, so when the modification time of the .clip file changes, the .png file is updated. In the demo video, ctrl+s is set to the button of the liquid tab to reflect it.
+#### Real-time update is not performed in .clip mode
+##### This addon monitors the modification time of the .clip file, so when the modification time of the .clip file changes, the .png file is updated. In the demo video, ctrl+s is assigned to a button on the pen tablet to reflect the changes.
+In Window Capture mode, it works in real time without saving.
 
 ### 日本語:
 #### 4k画像だと画質が悪くなる
-##### あくまでcanvasのプレビュー画像を.pngファイルに変換するだけなので、プレビュー画像の画質の限界が制限になります。 本アドオンでは、質感の確認作業を効率化することを目的としていて、最終的にはプレビュー画像ではなくて、出力したtextureを使用することを想定しています。
+##### Window Captureのほうだと制限がないので4kでもリアルタイム更新できます。
 
-#### リアルタイムに更新されない
+#### .clipモードの場合はリアルタイムに更新されない
 ##### .clipファイルの更新日時を監視しているので、.clipファイルの更新日時が変わると、.pngファイルが更新されます。 デモの動画では、液タブのボタンにctrl+sを設定して、押して反映させています。
+Window Captureモードであれば、セーブをしなくてもリアルタイムで動きます。
