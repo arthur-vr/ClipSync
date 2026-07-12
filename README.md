@@ -1,5 +1,7 @@
 # ClipSync
 
+Version: **1.1.0-sun**
+
 English:
 Synchronize canvas preview image from .clip file to .png file in blender
 
@@ -37,6 +39,12 @@ English:
 - f3を押してclipsyncと検索
 
 ## Panel Description
+
+The sync source can be selected in the ClipSync dialog:
+
+- `.clip file`: the original ClipSync workflow.
+- `Window Capture`: fetch projects whose Sync toggle is ON, then select one or more projects by name and ID. Selected name/ID pairs remain visible when the app is offline; blank names are shown as `Unnamed`. Each latest in-memory frame updates its Blender Image datablock without writing a temporary PNG.
+- `Settings`: configure the ClipSync app port (default `48123`) and interface language. Receiver timing follows the FPS configured for each project in the ClipSync app. English, Japanese, Simplified Chinese, and Korean are supported; settings are persisted.
 
 ![Panel](./images/demo_panel.png)
 
