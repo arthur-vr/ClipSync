@@ -4,11 +4,11 @@ from . import op_stop_loop
 
 bl_info = {
     "name": "ClipSync",
-    "blender": (4, 2, 0),
+    "blender": (3, 0, 0),
     "category": "Object",
     "description": "sync .clip files or Window Capture frames to Blender images",
     "author": "Smiley Cat",
-    "version": (1, 1, 0),
+    "version": (1, 1, 1),
     "location": "View3D > Object > ClipSync",
 }
 

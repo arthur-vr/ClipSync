@@ -1,0 +1,4 @@
+interface:
+  display_name: "Update Add-on Version"
+  short_description: "Synchronize ClipSync release versions."
+  default_prompt: "Use $update-addon-version to update ClipSync to the requested semantic version and verify every version reference."
