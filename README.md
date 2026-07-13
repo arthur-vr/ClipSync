@@ -1,6 +1,6 @@
 # ClipSync
 
-Version: **1.1.0-sun**
+Version: **1.1.1-sun**
 
 English:
 Synchronize canvas preview image from .clip file to .png file in blender
@@ -24,6 +24,10 @@ This is a volunteer project.  If you find it useful, please consider supporting 
 [Blender addon](https://github.com/arthur-vr/ClipSync/releases)
 
 [Desktop App](https://arthur484.booth.pm/items/8609124)
+
+## Blender compatibility
+
+ClipSync aims to remain compatible with Blender 3.0 and later.
 
 ## How to invoke
 
